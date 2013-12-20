@@ -31,44 +31,50 @@ public class TelephoneKeypadsPlus {
 	}
 
 	//Efficient solution
-	public void count(String telNumber) throws IOException {
+	public void efficientMakeNumbersPlus(String telNumber) throws IOException {
 		ArrayList<String> subWords = new ArrayList<>();
-		int numLength = telNumber.length();
-		int[] digits = new int[numLength];
-		int[] keyIndex = new int[numLength];
-		int[] keyLength = new int[numLength];
-		int totPermutations = 1;
-
-		for (int i = 0; i < numLength; i++) {
-			digits[i] = Integer.valueOf(telNumber.charAt(i) + "");
-			keyLength[i] = keys[digits[i]].length();
-			totPermutations = totPermutations * keyLength[i];
+		ArrayList<Integer> digits = new ArrayList<>();
+		ArrayList<Integer> keyIndex = new ArrayList<>();
+		ArrayList<Integer> keyLength = new ArrayList<>();
+		int permutations = 1;
+		int digit=0;
+		
+		for (int i = 0; i < telNumber.length(); i++) {
+			if((digit =Integer.valueOf(telNumber.charAt(i) + ""))>1){
+				digits.add(digit);
+				keyLength.add(keys[digit].length());
+				keyIndex.add(0);
+				permutations = permutations*keys[digit].length();
+			}
 		}
 
-		for (int i = 0; i < totPermutations; i++) {
+		for (int i = 0; i < permutations; i++) {
 			String subSeq = "";
-			int x = numLength - 1;
-			while (keyIndex[x] == keyLength[x]) {
-				keyIndex[x] = 0;
-				keyIndex[x - 1] += 1;
+			int x = digits.size()- 1;
+			while (keyIndex.get(x) == keyLength.get(x)) {
+				keyIndex.set(x,0);
+				keyIndex.set(x-1, keyIndex.get(x-1)+1);
 				x--;
 			}
-			for (int j = 0; j < numLength; j++) {
-				subSeq += keys[digits[j]].substring(keyIndex[j],keyIndex[j] + 1);
+			for (int j = 0; j < digits.size(); j++) {
+				int charIndex =keyIndex.get(j);
+				int currDigit = digits.get(j); 
+				String ch = keys[currDigit].substring(charIndex, charIndex+1);
+				subSeq += ch;
 			}
 			subWords.add(subSeq);
-			keyIndex[numLength - 1] += 1;
+			keyIndex.set(keyIndex.size()-1, keyIndex.get(keyIndex.size()-1)+1);
 		}
 		List<String> words = FileUtils.readLines(new File("brit-a-z.txt"));
 
 		for (String word : words) {
-			if (word.length() >= numLength
-					&& subWords.contains(word.substring(0, numLength))) {
+			if (word.length() >= digits.size()&& subWords.contains(word.substring(0, digits.size()))) {
 				System.out.println(word);
 			}
 		}
 
 	}
+	
 
 	//Inefficient solution
 	public void makeNumberPlus(String numSequence) throws IOException {
